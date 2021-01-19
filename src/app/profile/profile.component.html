@@ -1,0 +1,16 @@
+<div class="card">
+  <p><strong>Username:</strong> {{user.userName}}</p>
+<!--  <p>{{user.userName}}</p>-->
+  <p><strong>Name:</strong> {{user.Name}}</p>
+<!--  <p>{{user.Name}}</p>-->
+  <p><strong>Count of public repositories:</strong> {{user.countOfRepos}}</p>
+<!--  <p>{{user.countOfRepos}}</p>-->
+  <strong>Avatar:</strong>
+  <div>
+    <img [src]="user.avatar_url" alt="user avatar" width="150">
+  </div>
+  <div>
+    <p><strong>Link: </strong><a [href]="user.html_url" target="_blank">View the user's page</a>
+    </p>
+  </div>
+</div>

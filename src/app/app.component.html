@@ -1,0 +1,20 @@
+<div class="head">
+  <h3>Enter GitHub username:</h3>
+  <input #login (keydown.enter)="clickButton(but)" type="text" placeholder="username" value="artyomtrenin">
+  <button #but (click)="getData(login.value)">Find</button>
+</div>
+<div *ngIf="userIsFound; else noUser">
+  <app-profile [user]="user">
+  </app-profile>
+<!--  <app-profile></app-profile>-->
+  <app-repos
+    *ngFor="let iterRep of repos; let idx = index"
+    [rep]="iterRep"
+    [index]="idx+1"
+  ></app-repos>
+</div>
+
+<ng-template #noUser>
+  <p><strong>User is not found</strong></p>
+  <p>Try to find another user</p>
+</ng-template>
