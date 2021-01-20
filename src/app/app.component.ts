@@ -1,4 +1,5 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 
 /**
  * описывает репозиторий
@@ -31,74 +32,47 @@ export class AppComponent implements OnInit{
   @ViewChild('login', {static: true})
   input!: ElementRef;
 
+  constructor(private http: HttpClient){}
+
   title = 'testTask';
   userIsFound = false;
   repos: IRepos[] = [];
   user!: IUser;
 
   /**
-   * отправляет запрос на нужный url
-   * @param url - адрес на который нужно сделать запрос
-   */
-  sendRequest(url: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url);
-      xhr.responseType = 'json';
-      xhr.onload = () => {
-        if (xhr.status >= 400) {
-          this.userIsFound = false;
-          reject(`Status: ${xhr.status}`);
-        } else {
-          this.userIsFound = true;
-          resolve (xhr.response);
-        }
-      };
-      xhr.onerror = () => {
-        this.userIsFound = false;
-        reject('XHR on error');
-      };
-      xhr.send();
-    });
-  }
-
-  /**
-   * получает репозитории пользователя GitHub, вызывая sendRequest, и добавляет их в массив repos
+   * получает репозитории пользователя GitHub, используя HttpClient запрос, и добавляет их в массив repos
    * @param userName - имя пользователя, репозитории которого необходимо получить
    */
   getRepos(userName: string): void {
     const url = `https://api.github.com/users/${userName}/repos`;
-    this.sendRequest(url)
-      .then((data: {[index: string]: any}) => {
-        let key: string;
-        for (key of Object.keys(data)){
-          this.repos.push({
-            title: data[key].name,
-            description: data[key].description,
-            url: data[key].html_url
+    this.http.get(url).subscribe((data: {[index: string]: any}) => {
+      let key: string;
+      console.log(data);
+      for (key of Object.keys(data)) {
+        this.repos.push({
+          title: data[key].name,
+          description: data[key].description,
+          url: data[key].html_url
         });
       }
-      })
-      .catch((err: string) => console.error(err));
+      console.log(this.repos);
+    });
   }
 
   /**
-   * получает данные о пользователе GitHub, вызывая sendRequest, и записывает их в user: IUser
+   * получает данные о пользователе GitHub, используя HttpClient запрос, и записывает их в user: IUser
    * @param userName - имя пользователя, дынные которого необходимо получить
    */
   getUser(userName: string): void {
     const url = `https://api.github.com/users/${userName}`;
-    this.sendRequest(url)
-      .then((data: {[index: string]: any}) => {
-          this.user.avatar_url = data.avatar_url;
-          this.user.userName = data.login;
-          this.user.countOfRepos = data.public_repos;
-          this.user.Name = data.name;
-          this.user.html_url = data.html_url;
-      })
-      .catch((err: string) => {
-        console.error(err);
-      });
+    this.http.get(url).subscribe((data: {[index: string]: any}) => {
+      this.user.avatar_url = data.avatar_url;
+      this.user.userName = data.login;
+      this.user.countOfRepos = data.public_repos;
+      this.user.Name = data.name;
+      this.user.html_url = data.html_url;
+      this.userIsFound = true;
+    });
   }
 
   /**
